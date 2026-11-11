@@ -2,7 +2,7 @@
 
 FINLAB is a finance study app with **228 calculations in 18 topics**. Each calculation shows the units, the results, a source-based interpretation, recommendations with disclaimers, the Casio fx-991ES PLUS keystrokes and the academic references (with DOI links).
 
-This repository holds **only the installers**. The source code is private.
+This repository holds **only the installers** and the published web app (`app/`). The source code is private.
 
 ## Download
 
@@ -13,6 +13,7 @@ Open the **[latest release](../../releases/latest)** and pick the file for your 
 | `Amira.M.Kastour.FINLAB-<version>-universal.dmg` (or `-universal-mac.zip`) | macOS, Apple silicon and Intel: open it and drag the app to Applications |
 | `Amira.M.Kastour.FINLAB.Setup.<version>.exe` | Windows installer |
 | `Amira-M-Kastour-FINLAB-<version>-portable.exe` | Windows, runs without installing |
+| `Amira-M-Kastour-FINLAB-<version>-iOS.ipa` | iPhone and iPad (see *iPhone and iPad* below) |
 | `finlab-cli-macos.zip`, `finlab-cli-windows.zip` | the command-line program, no Python needed (`finlab --run 30`, `finlab --pdf report.pdf`, or no arguments for the menu) |
 
 ### First launch
@@ -21,6 +22,25 @@ The apps are not code-signed, so the first launch needs one extra click:
 
 - **macOS:** right-click the app → **Open** (or System Settings → Privacy & Security → **Open Anyway**).
 - **Windows:** when SmartScreen warns, choose **More info → Run anyway**.
+
+## iPhone and iPad
+
+There are two ways to get FINLAB on an iPhone or iPad. Both work offline and have all 228 calculations.
+
+**Web app (easiest, no Apple ID needed):** open **https://amira-m-kastour.github.io/amira-kastour-finlab-downloads/** in **Safari**,
+tap **Share → Add to Home Screen**, then open FINLAB from its icon. After the first visit it works without internet.
+New versions arrive by themselves the next time you open it online.
+
+**Native app (.ipa):** the app is not distributed through the App Store, so you install it yourself with a free Apple ID:
+
+1. On a Mac or Windows PC, install [Sideloadly](https://sideloadly.io) (or [AltStore](https://altstore.io)).
+2. Download `Amira-M-Kastour-FINLAB-<version>-iOS.ipa` from the [latest release](../../releases/latest).
+3. Connect the iPhone by cable, drag the .ipa into Sideloadly, enter your Apple ID and press **Start**.
+4. On the iPhone: Settings → General → VPN & Device Management → your Apple ID → **Trust**. On iOS 16 or later, also turn on
+   Settings → Privacy & Security → **Developer Mode** and restart when asked.
+
+With a free Apple ID the app stops opening after 7 days; install it again (or let AltStore refresh it) to continue.
+PDF reports, Excel files and the results notebook open the iOS share sheet: choose **Save to Files**, Mail, AirDrop and so on.
 
 ## What it does
 
@@ -48,6 +68,7 @@ Keep your keys private: don't paste them into shared pages, screenshots or files
 |---|---|
 | macOS app | macOS 11 or later, Apple silicon or Intel |
 | Windows app | Windows 10 or 11, 64-bit |
+| iPhone / iPad | iOS 15 or later (native app); Safari on iOS 16.4 or later (web app) |
 | Command-line program | macOS (Intel, or Apple silicon with Rosetta) or Windows 10/11, 64-bit |
 
 ## Notice
