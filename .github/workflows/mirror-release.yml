@@ -24,5 +24,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "${{ inputs.version }}" out/* -R "${{ github.repository }}" --target main \
-            --title "Amira M Kastour FINLAB ${{ inputs.version }}" --notes-file notes.md --latest
+          if gh release view "${{ inputs.version }}" -R "${{ github.repository }}" >/dev/null 2>&1; then
+            # the release is already here: add new files (for example the iPhone app) and replace changed ones
+            gh release upload "${{ inputs.version }}" out/* -R "${{ github.repository }}" --clobber
+          else
+            gh release create "${{ inputs.version }}" out/* -R "${{ github.repository }}" --target main \
+              --title "Amira M Kastour FINLAB ${{ inputs.version }}" --notes-file notes.md --latest
+          fi
