@@ -1,0 +1,28 @@
+name: Publish installers
+# Copies the installers of a FINLAB release into this repository's Releases.
+# Source: a release of the source repository (only while it can be read) or files attached by hand.
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag, e.g. v1.1.4"
+        required: true
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the installers
+        env:
+          GH_TOKEN: ${{ secrets.SOURCE_TOKEN || github.token }}
+        run: |
+          gh release download "${{ inputs.version }}" -R Amira-m-kastour/amira-kastour-finlab -D out
+          gh release view "${{ inputs.version }}" -R Amira-m-kastour/amira-kastour-finlab --json body -q .body > notes.md
+          ls -la out
+      - name: Create the release here
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ inputs.version }}" out/* -R "${{ github.repository }}" --target main \
+            --title "Amira M Kastour FINLAB ${{ inputs.version }}" --notes-file notes.md --latest
