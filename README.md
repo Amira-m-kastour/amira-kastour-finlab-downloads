@@ -2,7 +2,7 @@
 
 FINLAB is a finance study app with **228 calculations in 18 topics**. Each calculation shows the units, the results, a source-based interpretation, recommendations with disclaimers, the Casio fx-991ES PLUS keystrokes and the academic references (with DOI links).
 
-This repository holds **only the installers** and the published web app (`app/`). The source code is private.
+This repository holds **only the installers** and the published web app (`docs/`). The source code is private.
 
 ## Download
 
