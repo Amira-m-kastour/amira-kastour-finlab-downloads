@@ -1,6 +1,6 @@
 # Amira M Kastour FINLAB: downloads
 
-FINLAB is a finance study app with **228 calculations in 18 topics**. Each calculation shows the units, the results, a source-based interpretation, recommendations with disclaimers, the Casio fx-991ES PLUS keystrokes and the academic references (with DOI links).
+FINLAB is a finance study app with **240 calculations in 20 topics**. Each calculation shows the units, the results, a source-based interpretation, recommendations with disclaimers, the Casio fx-991ES PLUS keystrokes and the academic references (with DOI links).
 
 This repository holds **only the installers** and the published web app (`docs/`). The source code is private.
 
@@ -25,7 +25,7 @@ The apps are not code-signed, so the first launch needs one extra click:
 
 ## iPhone and iPad
 
-There are two ways to get FINLAB on an iPhone or iPad. Both work offline and have all 228 calculations.
+There are two ways to get FINLAB on an iPhone or iPad. Both work offline and have all 240 calculations.
 
 **Web app (easiest, no Apple ID needed):** open **https://amira-m-kastour.github.io/amira-kastour-finlab-downloads/** in **Safari**,
 tap **Share → Add to Home Screen**, then open FINLAB from its icon. After the first visit it works without internet.
@@ -59,11 +59,12 @@ FINLAB is developed by **Amira M Kastour**. If it helped your coursework, thesis
 }
 ```
 
-The same citation is on the app's *About & how to cite* page, at the end of every exported report, in the copied text and as the first entry of every exported `.bib` file.
+All citation styles (APA, Harvard, MLA, Chicago, IEEE, BibTeX and RIS) are on the app's *Cite my work* page; the APA citation is also on the *About & how to cite* page, at the end of every exported report, in the copied text and as the first entry of every exported `.bib` file.
 
 ## What it does
 
 - **Topics:** time value of money, risk and return, asset pricing, fund performance (Sharpe, Treynor, Jensen, M², information ratio, Sortino), statistics and event studies, cost of capital, valuation (DCF, multiples, ESG-adjusted), financial statement analysis, capital budgeting, fixed income and green bonds, derivatives (Black–Scholes step by step, Greeks, implied volatility), foreign exchange, funds and ETFs, sustainable finance, banking, personal finance, real estate and technical analysis.
+- **How it all fits together:** a topic map, six worked chains with diagrams, and on every page a diagram of what the calculation uses and feeds.
 - **Interpretation:** each result says how to read it according to the cited references, and lists the references it rests on.
 - **Calculator keystrokes:** the steps to reproduce every result on a Casio fx-991ES PLUS.
 - **Results notebook:** save a result and use it as an input in another calculation.
