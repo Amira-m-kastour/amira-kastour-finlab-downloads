@@ -42,6 +42,25 @@ New versions arrive by themselves the next time you open it online.
 With a free Apple ID the app stops opening after 7 days; install it again (or let AltStore refresh it) to continue.
 PDF reports, Excel files and the results notebook open the iOS share sheet: choose **Save to Files**, Mail, AirDrop and so on.
 
+## How to cite
+
+FINLAB is developed by **Amira M Kastour**. If it helped your coursework, thesis or paper, please cite it:
+
+> Kastour, A. M. (2026). *Amira M Kastour FINLAB* (Version 1.1.5) [Computer software]. https://github.com/Amira-m-kastour/amira-kastour-finlab-downloads
+
+```bibtex
+@software{kastour2026finlab,
+  author  = {Kastour, Amira M},
+  year    = {2026},
+  title   = {Amira M Kastour {FINLAB}},
+  version = {1.1.5},
+  note    = {Finance calculations with fx-991ES PLUS keystrokes, interpretation and academic sources},
+  url     = {https://github.com/Amira-m-kastour/amira-kastour-finlab-downloads}
+}
+```
+
+The same citation is on the app's *About & how to cite* page, at the end of every exported report, in the copied text and as the first entry of every exported `.bib` file.
+
 ## What it does
 
 - **Topics:** time value of money, risk and return, asset pricing, fund performance (Sharpe, Treynor, Jensen, M², information ratio, Sortino), statistics and event studies, cost of capital, valuation (DCF, multiples, ESG-adjusted), financial statement analysis, capital budgeting, fixed income and green bonds, derivatives (Black–Scholes step by step, Greeks, implied volatility), foreign exchange, funds and ETFs, sustainable finance, banking, personal finance, real estate and technical analysis.
