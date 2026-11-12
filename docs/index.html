@@ -154,10 +154,13 @@ ol.steps li{counter-increment:s}
 .rpdlg{position:fixed;inset:0;background:rgba(10,20,15,.45);display:flex;align-items:center;justify-content:center;z-index:50;padding:16px}
 .rpbox{background:var(--surface);color:var(--ink);border-radius:12px;max-width:900px;width:100%;max-height:92vh;display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.25)}
 .rphead{display:flex;justify-content:space-between;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line)}.rphead h2{font-family:var(--font-display);margin:0;font-size:20px}
-.rpgrid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;padding:14px 18px;overflow:auto}
+.rpgrid{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;padding:14px 18px;overflow:auto;flex:1 1 auto;min-height:140px}
 .rplist{display:flex;flex-direction:column;gap:3px;font-size:13.5px}.rplist fieldset{border:0;margin:0 0 8px;padding:0}.rplist legend{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);font-weight:600;padding:0;margin-bottom:2px}.rplist label{display:flex;gap:8px;align-items:flex-start;justify-content:flex-start;text-align:left;font-size:13.5px;font-weight:400;color:var(--ink);margin:0}.rplist input[type=checkbox]{width:auto;flex:none;margin:3px 0 0;padding:0;min-height:0}.rplist fieldset label{margin:2px 0}
 .rph{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin:12px 0 6px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.rpall .btn{padding:2px 8px;font-size:12px}
-.rpfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 18px;border-top:1px solid var(--line)}
+.rpfoot{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 18px;border-top:1px solid var(--line)}
+.rpbtns{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end;margin-left:auto}.rpbtns button:disabled{opacity:.55}
+.rpprev{flex:0 0 auto;padding:0 18px 6px;border-top:1px solid var(--line)}.rpprev summary{cursor:pointer;padding:10px 0;font-weight:600;color:var(--accent)}.rpprev iframe{display:block;width:100%;height:52vh;border:1px solid var(--line);border-radius:8px;background:#fff}
+.copybtn{float:right;font-size:12px;padding:3px 10px;text-transform:none;letter-spacing:0;font-weight:500}
 .rphost .tiles{grid-template-columns:repeat(4,1fr)}.rphost table.res{font-size:11.5px}.rphost table.res th{font-size:10.5px;padding:4px 5px}.rphost table.res td{padding:4px 5px}.rphost table.res table.res{table-layout:fixed;width:100%;font-size:10px;word-break:break-word}.rphost .tblwrap{overflow:visible}.rphost ol.rpsteps{padding-left:20px;font-size:13px}.rphost ol.rpsteps li{margin-bottom:6px}.rphost .card{border:0;padding:0}
 @media (max-width:720px){.rpgrid{grid-template-columns:1fr}}
 .unit{display:inline-block;font-size:11px;font-weight:500;color:var(--accent);background:var(--accent-soft);border-radius:4px;padding:0 5px;margin-left:4px;white-space:nowrap;vertical-align:1px}
@@ -207,7 +210,7 @@ footer.foot{font-size:12.5px;color:var(--muted);margin-top:26px;max-width:80ch}
     <button class="btn menu-toggle" id="menuBtn" aria-expanded="false">Show all calculations</button>
     <div class="groups" id="groups"></div>
     <div class="tribute" aria-label="Dedication"><img class="tribute-img" id="tributeImg" alt="Portrait of Mamdouh Kastour" width="64" height="64"><p class="tribute-cap"><em>In tribute to my father,</em><br><b>Mamdouh Kastour</b> (1950–2020)</p><p class="tribute-note">Photo: Kastour family. All rights reserved.</p></div>
-    <button class="btn export-btn" id="exportBtn">Export PDF report…</button>
+    <button class="btn export-btn" id="exportBtn">Export report…</button>
   </nav>
   <main id="main"></main>
 </div>
@@ -1330,10 +1333,9 @@ function rpCover(S,calcs,libs=[]){return `<div style="padding:150px 30px 40px;te
  ${rpState.author?`<p style="font-size:15px">Prepared by ${esc(rpState.author)}</p>`:''}<p>${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</p><p style="color:var(--muted);font-size:13px;max-width:520px;margin:18px auto 0">${calcs.length+libs.length} calculation${calcs.length+libs.length===1?'':'s'}: ${[...calcs.map(m=>m.title),...libs.map(x=>x.title)].map(esc).join(' · ')}</p>
  ${S.tribute?`<div style="margin-top:90px;font-family:Georgia,'Times New Roman',serif"><img src="${TRIBUTE_SRC}" alt="Portrait of Mamdouh Kastour" width="120" height="120" style="border-radius:50%;display:block;margin:0 auto 12px"><p style="font-style:italic;color:var(--muted);font-size:16px;margin:0">In tribute to my father,</p><p style="font-size:19px;margin:4px 0 0"><b>Mamdouh Kastour</b> (1950–2020)</p></div>`:''}
  <p style="color:var(--muted);font-size:12px;margin-top:${S.tribute?60:260}px">${DISCLAIMER}</p></div>`;}
-async function buildReport(onProgress){const S=rpState.secs,calcs=M.filter(m=>rpState.calcs.has(m.id)),libs=LIB.filter(x=>rpState.lib.has(x.id));
+/* The report's content as a list of HTML blocks; the PDF, the preview, the HTML report and the Word report all use it. */
+function rpBlocks(){const S=rpState.secs,calcs=M.filter(m=>rpState.calcs.has(m.id)),libs=LIB.filter(x=>rpState.lib.has(x.id));
  if(!calcs.length&&!libs.length&&!S.refs&&!S.datasrc)throw 'Tick at least one calculation, or the reference list or data sources.';
- await rpLoadLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
- const host=document.createElement('div');host.setAttribute('style',RP_LIGHT+'position:fixed;left:-12000px;top:0;width:760px;background:#fff;color:#18241f;font-family:var(--font-body);font-size:14px;line-height:1.45');host.className='rphost';document.body.appendChild(host);
  const blocks=[];if(S.cover)blocks.push({html:rpCover(S,calcs,libs),page:true,cover:true});
  calcs.forEach(m=>{rpBlocksFor(m,S).forEach((b,i)=>blocks.push(i===0?{...b,page:true}:b));});
  libs.forEach(fm=>{let r=null,err=null;try{r=flCompute(fm.id,libState[fm.id]);}catch(e){err=String(e);}
@@ -1348,6 +1350,10 @@ async function buildReport(onProgress){const S=rpState.secs,calcs=M.filter(m=>rp
  if(S.notebook&&NB.entries.length)blocks.push({html:nbReportHTML()});
  if(S.datasrc)blocks.push({html:`<h1 style="font-size:24px">Free data sources</h1><table class="res"><thead><tr><th>Source</th><th>How it is reached</th><th>Cost and limits</th><th>What it supplies</th><th>Used for</th></tr></thead><tbody>${DATA_SOURCES.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`,page:true});
  if(S.refs){for(let i=0;i<REF_ORDER.length;i+=8)blocks.push({html:`${i===0?'<h1 style="font-size:24px">References</h1>':''}<ol class="refs" start="${i+1}">${REF_ORDER.slice(i,i+8).map(r=>`<li>${refHTML(r)}</li>`).join('')}</ol>`,page:i===0});}
+ return blocks;}
+async function buildReport(onProgress){const S=rpState.secs,blocks=rpBlocks();
+ await rpLoadLibs();if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+ const host=document.createElement('div');host.setAttribute('style',RP_LIGHT+'position:fixed;left:-12000px;top:0;width:760px;background:#fff;color:#18241f;font-family:var(--font-body);font-size:14px;line-height:1.45');host.className='rphost';document.body.appendChild(host);
  const {jsPDF}=window.jspdf,pdf=new jsPDF({unit:'mm',format:'a4',compress:true}),PW=210,PH=297,MX=14,TOP=14,BOT=16,CW=PW-2*MX,CH=PH-TOP-BOT,px2mm=CW/760;let y=TOP,first=true;
  for(let bi=0;bi<blocks.length;bi++){const b=blocks[bi];onProgress&&onProgress(bi+1,blocks.length);host.innerHTML=`<div style="padding:2px 0 10px">${b.html}</div>`;
   const cv=await html2canvas(host,{scale:1.7,backgroundColor:'#ffffff',logging:false,windowWidth:900});const hmm=cv.height/1.7*px2mm;
@@ -1357,22 +1363,158 @@ async function buildReport(onProgress){const S=rpState.secs,calcs=M.filter(m=>rp
   else{const pxPerMm=cv.height/hmm;let done=0;while(done<cv.height-1){const room=(TOP+CH-y)*pxPerMm,slice=Math.min(room,cv.height-done);const c2=document.createElement('canvas');c2.width=cv.width;c2.height=Math.ceil(slice);c2.getContext('2d').drawImage(cv,0,done,cv.width,slice,0,0,cv.width,slice);pdf.addImage(c2.toDataURL('image/jpeg',0.82),'JPEG',MX,y,CW,slice/pxPerMm);done+=slice;y+=slice/pxPerMm;if(done<cv.height-1){pdf.addPage();y=TOP;}}}}
  host.remove();const n=pdf.getNumberOfPages();for(let i=1;i<=n;i++){pdf.setPage(i);pdf.setFontSize(7.5);pdf.setTextColor(91,107,100);if(!(i===1&&S.cover))pdf.text(`${(rpState.title||'Amira M Kastour FINLAB report').replace(/[^\x20-\x7E]/g,'')}  -  study aid, not investment advice`,MX,PH-8);pdf.text(`${i} / ${n}`,PW-MX,PH-8,{align:'right'});}
  pdf.setProperties({title:rpState.title||'Amira M Kastour FINLAB report',subject:'Portfolio performance, valuation and ESG calculations',author:rpState.author||'',creator:'fx-991ES PLUS Performance Lab'});return pdf;}
+/* ---- report exports besides the PDF: preview, HTML, Word (.docx), references (.bib) ---- */
+function rpFileBase(){return (rpState.title||'performance-lab-report').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'report';}
+/* Saves a file: through Claude's downloads when the page runs in Claude, otherwise as a normal browser download
+   (the desktop app and the iPhone app handle that one). Returns a message for the dialog. */
+async function rpSave(name,blob,extra=''){const dl=await rpDownloads();
+ if(dl){try{await dl.save({filename:name,data:blob});return {ok:true,text:`Saved ${name}${extra}.`};}
+  catch(er){const c=er&&er.code;return {ok:false,text:c==='declined'?'Download cancelled.':c==='rate_limited'?'Another download prompt is open; finish it, then try again.':`The download could not be offered here (${c||er}).`};}}
+ if(window.claude)return {ok:false,text:'Downloads are not available in this view. Open the artifact on claude.ai to save the file.'};
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),60000);
+ return {ok:true,text:`Downloaded ${name}${extra}.`};}
+/* A complete, self-contained HTML document of the report: the app's own styles in light colours, selectable text,
+   page breaks for printing to PDF. No scripts. */
+function rpHTML(){const blocks=rpBlocks(),title=rpState.title||'Amira M Kastour FINLAB report';
+ const css=[...document.querySelectorAll('style')].map(x=>x.textContent).join('\n');
+ const fontLinks=[...document.querySelectorAll('link[rel="stylesheet"],link[rel="preconnect"]')].map(l=>l.outerHTML).join('');
+ const own=`:root{${RP_LIGHT}}html,body{background:#fff!important;color:#18241f}body{display:block!important;max-width:820px;margin:28px auto!important;padding:0 22px 40px!important;font-family:var(--font-body);font-size:14px;line-height:1.5;overflow:visible!important;height:auto!important}
+.rpb{margin:0 0 6px}.rpb.page{margin-top:34px;padding-top:18px;border-top:1px solid var(--line)}.rpb.page:first-child,.rpb.cover+.rpb.page{border-top:0}.rpb.cover{min-height:60vh}
+.rpfoot-note{margin-top:40px;padding-top:10px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}a{color:var(--accent)}
+@page{size:A4;margin:16mm 14mm 18mm}@media print{body{max-width:none;margin:0!important;padding:0!important}.rpb.page{break-before:page;border-top:0;margin-top:0;padding-top:0}.rpb.page:first-child{break-before:auto}table,.tile,.interp,figure,svg,.formula,li{break-inside:avoid}h1,h2,h3,h4{break-after:avoid}}`;
+ const body=blocks.map(b=>`<section class="rpb${b.page?' page':''}${b.cover?' cover':''}">${b.html}</section>`).join('\n');
+ return `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>${esc(title)}</title>${fontLinks}<style>${css}\n${own}</style></head><body>
+${body}
+<p class="rpfoot-note">${esc(title)}${rpState.author?' · prepared by '+esc(rpState.author):''} · made with Amira M Kastour FINLAB on ${new Date().toISOString().slice(0,10)}. A study aid, not investment advice. To make a PDF, print this page and choose “Save as PDF”.</p>
+<script>
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body></html>`;}
+
+/* ---- Word (.docx): the same blocks, laid out once off-screen and converted element by element ---- */
+let rpZip=null;
+function rpLoadZip(){if(window.JSZip)return Promise.resolve();if(!rpZip)rpZip=rpLoad('vendor/jszip.min.js').catch(e=>{rpZip=null;throw e;});return rpZip;}
+const DX={x:s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g,'')};
+const DX_BLOCK=new Set(['DIV','P','H1','H2','H3','H4','H5','H6','TABLE','UL','OL','LI','SECTION','DETAILS','SUMMARY','FIGURE','PRE','BLOCKQUOTE','FIELDSET','svg','SVG','HR']);
+function dxRuns(node,fmt={}){let out='';node.childNodes.forEach(n=>{
+  if(n.nodeType===3){const t=n.textContent.replace(/\s+/g,' ');if(!t)return;
+   const pr=(fmt.b?'<w:b/>':'')+(fmt.i?'<w:i/>':'')+(fmt.mono?'<w:rFonts w:ascii="Consolas" w:hAnsi="Consolas"/>':'')+(fmt.color?`<w:color w:val="${fmt.color}"/>`:'')+(fmt.sub?'<w:vertAlign w:val="subscript"/>':fmt.sup?'<w:vertAlign w:val="superscript"/>':'')+(fmt.sz?`<w:sz w:val="${fmt.sz}"/>`:'');
+   out+=`<w:r>${pr?`<w:rPr>${pr}</w:rPr>`:''}<w:t xml:space="preserve">${DX.x(t)}</w:t></w:r>`;return;}
+  if(n.nodeType!==1)return;const tg=n.tagName;if(tg==='BR'){out+='<w:r><w:br/></w:r>';return;}if(tg==='SCRIPT'||tg==='STYLE'||tg==='BUTTON'||tg==='INPUT')return;
+  const f={...fmt};if(tg==='B'||tg==='STRONG'||tg==='TH')f.b=true;if(tg==='I'||tg==='EM')f.i=true;if(tg==='SUB')f.sub=true;if(tg==='SUP')f.sup=true;if(tg==='CODE'||n.classList&&n.classList.contains('ks'))f.mono=true;if(tg==='A')f.color='1F6B4F';
+  out+=dxRuns(n,f);});return out;}
+function dxPara(runs,style,opt={}){const ppr=(style?`<w:pStyle w:val="${style}"/>`:'')+(opt.pageBreak?'<w:pageBreakBefore/>':'')+(opt.center?'<w:jc w:val="center"/>':'')+(opt.shade?`<w:shd w:val="clear" w:color="auto" w:fill="${opt.shade}"/>`:'')+(opt.ind?`<w:ind w:left="${opt.ind}"/>`:'');
+ return `<w:p>${ppr?`<w:pPr>${ppr}</w:pPr>`:''}${runs||''}</w:p>`;}
+function dxTable(rows,head,W=9000){const cell=c=>typeof c==='string'?{x:c,span:1}:c,R=rows.map(r=>r.map(cell)),n=Math.max(...R.map(r=>r.reduce((a,c)=>a+c.span,0)),1),cw=Math.floor(W/n);
+ return `<w:tbl><w:tblPr><w:tblStyle w:val="FinTable"/><w:tblW w:w="${W}" w:type="dxa"/><w:tblLayout w:type="autofit"/></w:tblPr><w:tblGrid>${Array.from({length:n},()=>`<w:gridCol w:w="${cw}"/>`).join('')}</w:tblGrid>${R.map((r,ri)=>{const used=r.reduce((a,c)=>a+c.span,0);return `<w:tr>${ri===0&&head?'<w:trPr><w:tblHeader/></w:trPr>':''}${r.map(c=>`<w:tc><w:tcPr><w:tcW w:w="${cw*c.span}" w:type="dxa"/>${c.span>1?`<w:gridSpan w:val="${c.span}"/>`:''}${ri===0&&head?'<w:shd w:val="clear" w:color="auto" w:fill="E3EFE9"/>':''}</w:tcPr>${c.x||'<w:p/>'}</w:tc>`).join('')}${Array.from({length:Math.max(0,n-used)},()=>`<w:tc><w:tcPr><w:tcW w:w="${cw}" w:type="dxa"/></w:tcPr><w:p/></w:tc>`).join('')}</w:tr>`;}).join('')}</w:tbl><w:p/>`;}
+/* SVG charts become PNG pictures; colours set through CSS are copied onto the elements first */
+async function dxSvgPng(svg){const c=svg.cloneNode(true),src=svg.querySelectorAll('*'),dst=c.querySelectorAll('*');
+ src.forEach((el,i)=>{const cs=getComputedStyle(el),d=dst[i];['fill','stroke','stroke-width','stroke-dasharray','opacity','font-family','font-size','font-weight','text-anchor','dominant-baseline'].forEach(k=>{const v=cs.getPropertyValue(k);if(v)d.style.setProperty(k,v);});});
+ const r=svg.getBoundingClientRect(),vb=svg.viewBox&&svg.viewBox.baseVal,w=Math.round((vb&&vb.width)||r.width||640),h=Math.round((vb&&vb.height)||r.height||260);
+ c.setAttribute('width',w);c.setAttribute('height',h);c.setAttribute('xmlns','http://www.w3.org/2000/svg');
+ const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(c)],{type:'image/svg+xml'}));
+ try{const img=await new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>rej(new Error('chart'));im.src=url;});
+  const k=2,cv=document.createElement('canvas');cv.width=w*k;cv.height=h*k;const g=cv.getContext('2d');g.fillStyle='#fff';g.fillRect(0,0,cv.width,cv.height);g.drawImage(img,0,0,cv.width,cv.height);
+  const bin=atob(cv.toDataURL('image/png').split(',')[1]),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return {png:u8,w,h};}
+ finally{URL.revokeObjectURL(url);}}
+/* an <img> as PNG (drawn through a canvas, so any image type works); its on-screen size is kept */
+async function dxImg(im){try{if(!im.complete)await new Promise(r=>{im.onload=im.onerror=r;});const w=Math.round(im.getBoundingClientRect().width||im.naturalWidth),h=Math.round(im.getBoundingClientRect().height||im.naturalHeight);if(!w||!h)return null;
+ const k=3,cv=document.createElement('canvas');cv.width=w*k;cv.height=h*k;cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);const bin=atob(cv.toDataURL('image/png').split(',')[1]),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);return {png:u8,w,h};}catch(e){return null;}}
+async function buildDocx(onProgress){const blocks=rpBlocks();await rpLoadZip();
+ const host=document.createElement('div');host.setAttribute('style',RP_LIGHT+'position:fixed;left:-12000px;top:0;width:760px;background:#fff;color:#18241f;font-family:var(--font-body);font-size:14px');host.className='rphost';document.body.appendChild(host);
+ const media=[],body=[];let docPr=0;
+ const pic=(m,label,small)=>{media.push(m);const id='rIdImg'+media.length,cx=small?Math.min(5760000,Math.round(m.w*9525)):5760000,cy=Math.round(cx*m.h/m.w);docPr++;
+  return `<w:p>${small?'<w:pPr><w:jc w:val="center"/></w:pPr>':''}<w:r><w:drawing><wp:inline distT="0" distB="0" distL="0" distR="0"><wp:extent cx="${cx}" cy="${cy}"/><wp:docPr id="${docPr}" name="${DX.x(label)}" descr="${DX.x(label)}"/><a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main"><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:pic xmlns:pic="http://schemas.openxmlformats.org/drawingml/2006/picture"><pic:nvPicPr><pic:cNvPr id="${docPr}" name="${DX.x(label)}"/><pic:cNvPicPr/></pic:nvPicPr><pic:blipFill><a:blip r:embed="${id}"/><a:stretch><a:fillRect/></a:stretch></pic:blipFill><pic:spPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="${cx}" cy="${cy}"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></pic:spPr></pic:pic></a:graphicData></a:graphic></wp:inline></w:drawing></w:r></w:p>`;};
+ async function walk(el,out,st){for(const n of el.childNodes){
+  if(n.nodeType===3){if(n.textContent.trim())out.push(dxPara(dxRuns({childNodes:[n]})));continue;}
+  if(n.nodeType!==1)continue;const tg=n.tagName,cl=n.classList,brk=st.brk;
+  const P=(runs,style,o={})=>{out.push(dxPara(runs,style,{...o,pageBreak:o.pageBreak||st.brk}));st.brk=false;};
+  if(tg==='BUTTON'||tg==='INPUT'||tg==='SCRIPT'||tg==='STYLE'||(cl&&cl.contains('ds-only')))continue;
+  if(/^H[1-6]$/.test(tg)){P(dxRuns(n),tg==='H1'?'Heading1':tg==='H2'?'Heading2':'Heading3');continue;}
+  if(tg.toLowerCase()==='svg'){try{const m=await dxSvgPng(n);if(st.brk){out.push(dxPara('',null,{pageBreak:true}));st.brk=false;}out.push(pic(m,'Chart'));}catch(e){P(dxRuns({childNodes:[document.createTextNode('[chart – see the PDF or HTML report]')]}),null);}continue;}
+  if(tg==='IMG'){const m=await dxImg(n);if(m)out.push(pic(m,n.alt||'Picture',true));continue;}
+  if(tg==='TABLE'){const rows=[];for(const r of n.rows){const row=[];const tot=Math.max(1,[...n.rows].reduce((a,rr)=>Math.max(a,[...rr.cells].reduce((b,cc)=>b+(cc.colSpan||1),0)),0));for(const c of r.cells){const span=c.colSpan||1;if(c.querySelector('table,ul,ol,svg')){const inner=[];await walk(c,inner,{brk:false,w:Math.max(2400,Math.floor((st.w||9000)*span/tot)-240)});let x=inner.join('');if(!/<\/w:p>$/.test(x))x+='<w:p/>';row.push({x,span});}else row.push({x:dxPara(dxRuns(c,c.tagName==='TH'?{b:true}:{}),null),span});}rows.push(row);}if(rows.length){if(st.brk){out.push(dxPara('',null,{pageBreak:true}));st.brk=false;}out.push(dxTable(rows,!!n.tHead,st.w||9000));}continue;}
+  if(cl&&cl.contains('tiles')){const rows=[...n.children].map(t=>{const g=s=>t.querySelector(s);return [dxPara(dxRuns(g('.l')||t)),dxPara(dxRuns(g('.v')||{childNodes:[]},{b:true})),dxPara(dxRuns(g('.s')||{childNodes:[]}))];});if(rows.length){if(st.brk){out.push(dxPara('',null,{pageBreak:true}));st.brk=false;}out.push(dxTable([[dxPara('<w:r><w:t>Result</w:t></w:r>'),dxPara('<w:r><w:t>Value</w:t></w:r>'),dxPara('<w:r><w:t>Note</w:t></w:r>')]].concat(rows),true));}continue;}
+  if(tg==='UL'||tg==='OL'){let k=0;for(const li of n.children){k++;P((`<w:r><w:t xml:space="preserve">${tg==='OL'?(+(n.getAttribute('start')||1)+k-1)+'. ':'• '}</w:t></w:r>`)+dxRuns(li),null,{ind:360});}continue;}
+  if(cl&&cl.contains('formula')){P(dxRuns(n,{b:true}),null,{shade:'E3EFE9'});continue;}
+  if(cl&&cl.contains('eyebrow')){P(dxRuns(n,{color:'1F6B4F',sz:18,b:true}),null);continue;}
+  const hasBlock=[...n.children].some(c=>DX_BLOCK.has(c.tagName)||(c.classList&&(c.classList.contains('tiles')||c.classList.contains('formula'))));
+  const disp=getComputedStyle(n).display,sep='<w:r><w:t xml:space="preserve">   </w:t></w:r>';
+  if(hasBlock)await walk(n,out,st);else{const r=/flex|grid/.test(disp)&&n.children.length>1?[...n.childNodes].map(c=>c.nodeType===1?dxRuns(c):c.nodeType===3&&c.textContent.trim()?dxRuns({childNodes:[c]}):'').filter(Boolean).join(sep):dxRuns(n);if(r)P(r,null,cl&&(cl.contains('err')||cl.contains('note'))?{shade:cl.contains('err')?'FBE7E5':'F4F6F4'}:{});}}}
+ try{for(let bi=0;bi<blocks.length;bi++){const b=blocks[bi];onProgress&&onProgress(bi+1,blocks.length);host.innerHTML=b.html;const st={brk:!!b.page&&bi>0};
+   if(b.cover){const t=host.querySelector('h1');body.push(dxPara(`<w:r><w:t xml:space="preserve">${DX.x(t?t.textContent:'Report')}</w:t></w:r>`,'Title'));
+    for(const el of host.querySelectorAll('p,img')){if(el.tagName==='IMG'){const m=await dxImg(el);if(m)body.push(pic(m,el.alt||'Picture',true));}else if(el.textContent.trim())body.push(dxPara(dxRuns(el),null,{center:true}));}continue;}
+   await walk(host,body,st);}}
+ finally{host.remove();}
+ const title=rpState.title||'Amira M Kastour FINLAB report';
+ body.push(dxPara(`<w:r><w:rPr><w:i/><w:color w:val="5B6B64"/><w:sz w:val="18"/></w:rPr><w:t xml:space="preserve">${DX.x(title)}${rpState.author?' · prepared by '+DX.x(rpState.author):''} · made with Amira M Kastour FINLAB on ${new Date().toISOString().slice(0,10)}. A study aid, not investment advice.</w:t></w:r>`));
+ const NS='xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing"';
+ const doc=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ${NS}><w:body>${body.join('')}<w:sectPr><w:footerReference w:type="default" r:id="rIdFoot"/><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="567" w:footer="567" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+ const font='<w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:cs="Calibri"/>';
+ const styles=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr>${font}<w:sz w:val="21"/><w:lang w:val="en-GB"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="100" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>
+<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>
+<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:pPr><w:spacing w:before="1800" w:after="240"/><w:jc w:val="center"/></w:pPr><w:rPr><w:b/><w:sz w:val="52"/><w:color w:val="18241F"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="240" w:after="120"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:sz w:val="36"/><w:color w:val="18241F"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="220" w:after="100"/><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:b/><w:sz w:val="28"/><w:color w:val="1F6B4F"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Heading3"><w:name w:val="heading 3"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="200" w:after="80"/><w:outlineLvl w:val="2"/></w:pPr><w:rPr><w:b/><w:caps/><w:sz w:val="20"/><w:color w:val="5B6B64"/></w:rPr></w:style>
+<w:style w:type="paragraph" w:styleId="Footer"><w:name w:val="footer"/><w:basedOn w:val="Normal"/><w:rPr><w:sz w:val="16"/><w:color w:val="5B6B64"/></w:rPr></w:style>
+<w:style w:type="table" w:styleId="FinTable"><w:name w:val="FINLAB table"/><w:tblPr><w:tblBorders><w:top w:val="single" w:sz="4" w:color="DCE3DF"/><w:left w:val="single" w:sz="4" w:color="DCE3DF"/><w:bottom w:val="single" w:sz="4" w:color="DCE3DF"/><w:right w:val="single" w:sz="4" w:color="DCE3DF"/><w:insideH w:val="single" w:sz="4" w:color="DCE3DF"/><w:insideV w:val="single" w:sz="4" w:color="DCE3DF"/></w:tblBorders><w:tblCellMar><w:top w:w="40" w:type="dxa"/><w:left w:w="80" w:type="dxa"/><w:bottom w:w="40" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr><w:rPr><w:sz w:val="18"/></w:rPr><w:pPr><w:spacing w:after="0"/></w:pPr></w:style></w:styles>`;
+ const footer=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:ftr ${NS}><w:p><w:pPr><w:pStyle w:val="Footer"/><w:tabs><w:tab w:val="right" w:pos="9638"/></w:tabs></w:pPr><w:r><w:t xml:space="preserve">${DX.x(title)} – study aid, not investment advice</w:t></w:r><w:r><w:tab/></w:r><w:r><w:fldChar w:fldCharType="begin"/></w:r><w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r><w:r><w:fldChar w:fldCharType="separate"/></w:r><w:r><w:t>1</w:t></w:r><w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>`;
+ const zip=new JSZip();
+ zip.file('[Content_Types].xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/><Override PartName="/word/footer1.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/><Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/></Types>`);
+ zip.file('_rels/.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/></Relationships>`);
+ zip.file('docProps/core.xml',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${DX.x(title)}</dc:title><dc:creator>${DX.x(rpState.author||'')}</dc:creator><dc:subject>Portfolio performance, valuation and ESG calculations</dc:subject><dcterms:created xsi:type="dcterms:W3CDTF">${new Date().toISOString().replace(/\.\d+Z$/,'Z')}</dcterms:created></cp:coreProperties>`);
+ zip.file('word/document.xml',doc);zip.file('word/styles.xml',styles);zip.file('word/footer1.xml',footer);
+ zip.file('word/_rels/document.xml.rels',`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rIdStyles" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/><Relationship Id="rIdFoot" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/footer" Target="footer1.xml"/>${media.map((m,i)=>`<Relationship Id="rIdImg${i+1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/image" Target="media/image${i+1}.png"/>`).join('')}</Relationships>`);
+ media.forEach((m,i)=>zip.file(`word/media/image${i+1}.png`,m.png));
+ return zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',compression:'DEFLATE'});}
+
+/* ---- references (.bib): the sources cited in the report. BibTeX is fetched from doi.org when there is a DOI and
+   the network allows it; otherwise (and for lectures) an @misc entry keeps the full reference text unchanged. ---- */
+function rpRefsUsed(){const S=rpState.secs;if(S.refs)return REF_ORDER.slice();const html=rpBlocks().map(b=>b.html).join('\n');
+ return REF_ORDER.filter(r=>{const d=(String(r).match(/https:\/\/doi\.org\/[^\s\]]+/)||[])[0];return (d&&html.includes(esc(d.replace(/[.,;]$/,''))))||html.includes(esc(String(r)).slice(0,70));});}
+const bibEsc=s=>String(s).replace(/\\/g,'\\textbackslash{}').replace(/([&%$#_])/g,'\\$1').replace(/[{}]/g,'').replace(/~/g,'\\textasciitilde{}');
+function bibMisc(r,key){const t=String(r),d=(t.match(/https:\/\/doi\.org\/([^\s\]]+)/)||[])[1],u=(t.match(/https?:\/\/[^\s\]]+/)||[])[0],y=(t.match(/\((\d{4})[a-z]?\)|\b(19|20)\d{2}\b/)||[])[0];
+ return `@misc{${key},\n  note = {${bibEsc(t)}}${y?`,\n  year = {${y.replace(/\D/g,'').slice(0,4)}}`:''}${d?`,\n  doi = {${bibEsc(d.replace(/[.,;]$/,''))}}`:''}${u&&!d?`,\n  url = {${u.replace(/[.,;]$/,'')}}`:''}\n}`;}
+function bibKey(r,used){const t=String(r),a=(t.match(/^[^,(.]+/)||['ref'])[0].normalize('NFD').replace(/[^A-Za-z]/g,'')||'ref',lec=(t.match(/Lecture (\d+)/)||[])[1],y=lec?'lecture'+lec:(t.match(/\b(19|20)\d{2}\b/)||[''])[0];let k=a.toLowerCase()+y,s='',n=0;while(used.has(k+s))s=String.fromCharCode(97+n++);used.add(k+s);return k+s;}
+async function buildBib(onProgress){const refs=rpRefsUsed();if(!refs.length)throw 'No references in this report: tick “Why this method and its sources” or “Full reference list”.';
+ const used=new Set(),out=new Array(refs.length);let online=0,i=0,done=0;
+ const one=async k=>{const r=refs[k],key=bibKey(r,used),d=(String(r).match(/https:\/\/doi\.org\/([^\s\]]+)/)||[])[1];let e=null;
+  if(d){try{const ctl=new AbortController(),tm=setTimeout(()=>ctl.abort(),8000);const res=await fetch('https://doi.org/'+d.replace(/[.,;]$/,''),{headers:{Accept:'application/x-bibtex; charset=utf-8'},signal:ctl.signal});clearTimeout(tm);
+   if(res.ok){const b=(await res.text()).trim();if(/^@\w+\s*\{/.test(b)){e=b.replace(/^(@\w+\s*\{)\s*[^,]*,/,`$1${key},`);online++;}}}catch(er){}}
+  out[k]=e||bibMisc(r,key);onProgress&&onProgress(++done,refs.length);};
+ const workers=Array.from({length:Math.min(6,refs.length)},async()=>{while(i<refs.length)await one(i++);});await Promise.all(workers);
+ const head=`% References for: ${rpState.title||'Amira M Kastour FINLAB report'}\n% Made with Amira M Kastour FINLAB on ${new Date().toISOString().slice(0,10)}. ${online} of ${refs.length} entries came from doi.org; the others are @misc entries with the full reference text in "note".\n\n`;
+ return {blob:new Blob([head+out.join('\n\n')+'\n'],{type:'application/x-bibtex'}),n:refs.length,online};}
 function openExport(){if(!rpState.calcs)rpState.calcs=new Set(M.some(m=>m.id===current)?[current]:[]);if(String(current).startsWith('lib-'))rpState.lib.add(String(current).slice(4));const S=rpState.secs;
  const dlg=document.createElement('div');dlg.className='rpdlg';dlg.setAttribute('role','dialog');dlg.setAttribute('aria-modal','true');dlg.setAttribute('aria-labelledby','rpdh');
- dlg.innerHTML=`<div class="rpbox"><div class="rphead"><h2 id="rpdh">Export a PDF report</h2><button class="btn" data-rp="close" aria-label="Close">✕</button></div>
+ dlg.innerHTML=`<div class="rpbox"><div class="rphead"><h2 id="rpdh">Export a report</h2><button class="btn" data-rp="close" aria-label="Close">✕</button></div>
  <div class="rpgrid"><div><h3 class="rph">Calculations <span class="rpall"><button class="btn" data-rp="all">All</button> <button class="btn" data-rp="none">None</button> <button class="btn" data-rp="cur">This page</button> <button class="btn" data-rp="firm">Firm-specific</button> <button class="btn" data-rp="market">Index &amp; market</button></span></h3>
  <div class="rplist">${TOPICS.map(([t,tn])=>{const {mains,libs}=topicItems(t);return `<fieldset><legend>${esc(tn)}</legend>${mains.map(m=>`<label><input type="checkbox" data-rc="${m.id}"${rpState.calcs.has(m.id)?' checked':''}> ${m.title} (${esc(groupName(m.lec))})</label>`).join('')}${libs.map(x=>`<label><input type="checkbox" data-rl="${x.id}"${rpState.lib.has(x.id)?' checked':''}> ${esc(x.title)}</label>`).join('')}</fieldset>`;}).join('')}</div></div>
  <div><h3 class="rph">Include</h3><div class="rplist">${RP_SECTIONS.map(([k,l])=>`<label><input type="checkbox" data-rs="${k}"${S[k]?' checked':''}> ${l}</label>`).join('')}</div>
  <div class="field" style="margin-top:12px"><label for="rp-title">Report title</label><input id="rp-title" value="${esc(rpState.title)}"></div><div class="field"><label for="rp-author">Prepared by (optional)</label><input id="rp-author" value="${esc(rpState.author)}"></div>
- <p class="note">Each calculation uses the inputs currently on its page (your data or the example). The PDF is made in this browser; pages are images of the app's layout, so text in the PDF is not selectable.</p></div></div>
- <div class="rpfoot"><span id="rp-msg" class="lvmsg" role="status"></span><button class="btn" data-rp="go" id="rp-go">Create PDF</button></div></div>`;
- document.body.appendChild(dlg);const close=()=>{dlg.remove();document.getElementById('exportBtn').focus();};
+ <p class="note">Each calculation uses the inputs currently on its page (your data or the example). Everything is made in this browser. <b>PDF</b>: pages are pictures of the app's layout, so its text cannot be selected. <b>HTML</b>: selectable text; open it and print to PDF for a searchable PDF. <b>Word</b>: editable .docx with the charts as pictures. <b>References</b>: a BibTeX file of the sources cited (from doi.org when online).</p></div></div>
+ <details class="rpprev" id="rp-prev"><summary>Preview</summary><p class="note" style="margin:6px 0">Updates as you tick. Charts and layout are as in the HTML and Word reports; the PDF uses the same content.</p><iframe sandbox="" title="Report preview" id="rp-frame"></iframe></details>
+ <div class="rpfoot"><span id="rp-msg" class="lvmsg" role="status"></span><span class="rpbtns"><button class="btn" data-rp="bib">References (.bib)</button> <button class="btn" data-rp="docx">Word</button> <button class="btn" data-rp="html">HTML</button> <button class="btn" data-rp="go" id="rp-go">Create PDF</button></span></div></div>`;
+ document.body.appendChild(dlg);const close=()=>{clearTimeout(prevT);dlg.remove();document.getElementById('exportBtn').focus();};
+ const prev=dlg.querySelector('#rp-prev'),frame=dlg.querySelector('#rp-frame');let prevT=null;
+ const showPrev=()=>{if(!prev.open)return;try{frame.srcdoc=rpHTML();}catch(er){frame.srcdoc=`<!DOCTYPE html><p style="font:14px sans-serif;color:#5b6b64;padding:16px">${esc(typeof er==='string'?er:er.message||String(er))}</p>`;}};
+ const prevSoon=()=>{clearTimeout(prevT);prevT=setTimeout(showPrev,350);};prev.addEventListener('toggle',showPrev);dlg.addEventListener('input',prevSoon);
  dlg.addEventListener('keydown',e=>{if(e.key==='Escape')close();});dlg.addEventListener('click',e=>{if(e.target===dlg)close();});
- dlg.addEventListener('change',e=>{const t=e.target;if(t.dataset.rl){t.checked?rpState.lib.add(t.dataset.rl):rpState.lib.delete(t.dataset.rl);}if(t.dataset.rc){t.checked?rpState.calcs.add(t.dataset.rc):rpState.calcs.delete(t.dataset.rc);}if(t.dataset.rs)S[t.dataset.rs]=t.checked;});
+ dlg.addEventListener('change',e=>{const t=e.target;if(t.dataset.rl){t.checked?rpState.lib.add(t.dataset.rl):rpState.lib.delete(t.dataset.rl);}if(t.dataset.rc){t.checked?rpState.calcs.add(t.dataset.rc):rpState.calcs.delete(t.dataset.rc);}if(t.dataset.rs)S[t.dataset.rs]=t.checked;prevSoon();});
  dlg.querySelector('#rp-title').addEventListener('input',e=>rpState.title=e.target.value);dlg.querySelector('#rp-author').addEventListener('input',e=>rpState.author=e.target.value);
- const setAll=(ids,lib)=>{rpState.calcs=new Set(ids);if(lib)rpState.lib=new Set(lib);dlg.querySelectorAll('[data-rc]').forEach(c=>c.checked=rpState.calcs.has(c.dataset.rc));dlg.querySelectorAll('[data-rl]').forEach(c=>c.checked=rpState.lib.has(c.dataset.rl));};
+ const setAll=(ids,lib)=>{rpState.calcs=new Set(ids);if(lib)rpState.lib=new Set(lib);dlg.querySelectorAll('[data-rc]').forEach(c=>c.checked=rpState.calcs.has(c.dataset.rc));dlg.querySelectorAll('[data-rl]').forEach(c=>c.checked=rpState.lib.has(c.dataset.rl));prevSoon();};
  dlg.addEventListener('click',async e=>{const b=e.target.closest('[data-rp]');if(!b)return;const a=b.dataset.rp,msg=dlg.querySelector('#rp-msg');
   if(a==='close')return close();if(a==='all')return setAll(M.map(m=>m.id),LIB.map(x=>x.id));if(a==='none')return setAll([],[]);if(a==='cur')return setAll(M.some(m=>m.id===current)?[current]:[]);if(a==='firm'||a==='market')return setAll(M.filter(m=>CATEGORY[m.id]===a).map(m=>m.id),LIB.filter(x=>x.category===a).map(x=>x.id));
+  if(a==='html'||a==='docx'||a==='bib'){const bs=dlg.querySelectorAll('.rpbtns button');bs.forEach(x=>x.disabled=true);msg.className='lvmsg';
+   try{let r;if(a==='html'){r=await rpSave(rpFileBase()+'.html',new Blob([rpHTML()],{type:'text/html'}));}
+    else if(a==='docx'){msg.textContent='Loading the Word tools…';const blob=await buildDocx((i,n)=>{msg.textContent=`Converting block ${i} of ${n}…`;});r=await rpSave(rpFileBase()+'.docx',blob);}
+    else{msg.textContent='Collecting the references…';const b=await buildBib((i,n)=>{msg.textContent=`Reference ${i} of ${n}…`;});r=await rpSave(rpFileBase()+'-references.bib',b.blob,` (${b.n} references, ${b.online} from doi.org)`);}
+    msg.className='lvmsg '+(r.ok?'ok':'bad');msg.textContent=r.text;}
+   catch(er){msg.className='lvmsg bad';msg.textContent=typeof er==='string'?er:'Could not create the file: '+(er&&er.message||er);}
+   bs.forEach(x=>x.disabled=false);return;}
   if(a==='go'){const go=dlg.querySelector('#rp-go');go.disabled=true;msg.className='lvmsg';msg.textContent='Loading the PDF tools…';
    try{const pdf=await buildReport((i,n)=>{msg.textContent=`Laying out block ${i} of ${n}…`;});const name=((rpState.title||'performance-lab-report').replace(/[^\w\- ]+/g,'').trim().replace(/\s+/g,'-')||'report')+'.pdf';
     const dl=await rpDownloads();
@@ -1565,7 +1707,7 @@ function renderLib(fid){const fm=LIB_BY[fid];if(!fm)return renderLibIndex();docu
  document.getElementById('main').innerHTML=`<div class="head"><div><div class="eyebrow"><a href="#topic-${fm.topic}">${esc(topicName(fm.topic))}</a> · formula library</div><h1>${esc(fm.title)}</h1><div style="margin-top:6px">${catChipFor(fm.category)} ${fm.skills.filter(s=>s!=='setup').map(s=>`<a class="chip neutral" href="#calc-guide">${esc(skillName(s))}</a>`).join(' ')}</div></div></div>
  <div class="formula">${esc(fm.formula)}</div>
  <div class="grid2"><section class="card"><h3>Inputs <button class="btn" id="libReset">Restore example</button></h3><p class="note">${esc(UNIT_NOTE)}</p><div class="fields">${fm.inputs.map(field).join('')}</div></section>
- <section class="card" aria-live="polite"><h3>Results</h3><div id="libres">${libResultHTML(fid)}</div></section></div>
+ <section class="card"><h3>Results <button class="btn copybtn" data-copy="libres" title="Copy the results and interpretation as text">Copy</button></h3><div id="libres" aria-live="polite">${libResultHTML(fid)}</div></section></div>
  <section class="card" style="margin-top:16px"><h3>On your fx-991ES PLUS</h3><div id="libkeys">${libStepsHTML(fid)}</div></section>
  <section class="card" style="margin-top:16px"><h3>Academic sources</h3><ul class="refs">${fm.refs.map(k=>`<li>${refHTML(refText(k))}</li>`).join('')}</ul>${fm.note?`<p class="note">Context: ${esc(fm.note)}</p>`:''}</section><footer class="foot">${DISCLAIMER}</footer>`;
  document.querySelectorAll('#main [data-pick]').forEach(b=>b.addEventListener('click',()=>{const inp=fm.inputs.find(i=>i.id===b.dataset.pick);openPicker('lib-'+fid,inp.id,inp.unit,inp.label,()=>renderLib(fid));}));
@@ -1598,7 +1740,7 @@ function renderPage(){const m=M.find(x=>x.id===current);document.querySelectorAl
  document.getElementById('main').innerHTML=`<div class="head"><div><div class="eyebrow"><a href="#topic-${MAIN_TOPIC[m.id]}">${esc(topicName(MAIN_TOPIC[m.id]))}</a> · worked example from ${groupName(m.lec)}${m.lecture?' (numbers from the slides)':m.ext?' (standard formula, not on the slides)':''}</div><h1>${m.title}</h1><div style="margin-top:6px">${catChip(m.id)} ${(MAIN_SKILLS[m.id]||[]).map(s=>`<a class="chip neutral" href="#calc-guide">${esc(skillName(s))}</a>`).join(' ')}</div></div></div>
  <div class="formula">${m.formula}</div>
  <div class="grid2"><section class="card" aria-labelledby="inh"><h3 id="inh">Inputs <button class="btn" id="resetBtn">Restore example</button></h3>${m.needs?`<details class="needs" open><summary>What you need before you start</summary><ul>${m.needs.map(x=>`<li>${x}</li>`).join('')}</ul><p>The example values below are placeholders; replace every one with your own data.</p><p><b>Units.</b> ${esc(UNIT_NOTE)} Each input shows its unit beside the label.</p></details>`:''}<div class="fields" id="fields">${renderInputs(m)}</div></section>
- <section class="card" aria-live="polite"><h3>Results</h3><div id="results"></div></section></div>
+ <section class="card"><h3>Results <button class="btn copybtn" data-copy="results" title="Copy the results, interpretation and recommendations as text">Copy</button></h3><div id="results" aria-live="polite"></div></section></div>
  <div class="calc"><section class="card"><h3>On your fx-991ES PLUS <span style="text-transform:none;letter-spacing:0;font-weight:400">select a step to see its screen</span></h3><div id="steps"></div></section>
  <aside class="device" aria-label="Simulated calculator screen"><div class="model"><b>CASIO</b><span>fx-991ES PLUS</span></div><div class="lcd" id="lcd"></div><div class="cap" id="lcdcap"></div><div class="pad"><button class="btn" id="prevStep">◄ Step</button><button class="btn" id="nextStep" style="grid-column:span 2">Next step ►</button><button class="btn" id="lastStep">Answer</button></div></aside></div>
  ${liveCard(m)}
@@ -1729,15 +1871,17 @@ function route(){const h=location.hash.slice(1);if(h==='notebook'){current='note
 buildNav();
 document.getElementById('tributeImg').src=TRIBUTE_SRC;
 document.getElementById('exportBtn').addEventListener('click',openExport);
+/* Copy buttons: the results card as plain text (title and formula first), for notes, e-mails or a report */
+async function copyText(t){try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(t);return true;}}catch(e){}
+ const ta=document.createElement('textarea');ta.value=t;ta.setAttribute('readonly','');ta.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy');}catch(e){}ta.remove();return ok;}
+document.addEventListener('click',async e=>{const b=e.target.closest('[data-copy]');if(!b)return;const box=document.getElementById(b.dataset.copy);if(!box)return;
+ const main=document.getElementById('main'),h=main&&main.querySelector('h1'),f=main&&main.querySelector('.formula');
+ const txt=[h&&h.innerText.trim(),f&&f.innerText.replace(/\s+/g,' ').trim(),box.innerText.replace(/\n{3,}/g,'\n\n').trim(),'– Amira M Kastour FINLAB · study aid, not investment advice'].filter(Boolean).join('\n\n');
+ const ok=await copyText(txt);const old=b.textContent;b.textContent=ok?'Copied':'Copy failed – select the text';setTimeout(()=>{b.textContent=old;},ok?1500:3000);});
 document.getElementById('groups').addEventListener('click',e=>{const b=e.target.closest('.catfilter button');if(b){navCat=b.dataset.cat;applyNavCat();}});
 document.getElementById('groups').addEventListener('click',e=>{const a=e.target.closest('a');if(a){document.getElementById('nav').classList.remove('open');document.getElementById('menuBtn').setAttribute('aria-expanded','false');}});
 document.getElementById('menuBtn').addEventListener('click',()=>{const n=document.getElementById('nav');const o=n.classList.toggle('open');document.getElementById('menuBtn').setAttribute('aria-expanded',o);});
 window.addEventListener('hashchange',route);route();
-</script>
-<script>
-if ('serviceWorker' in navigator && location.protocol === 'https:' && !(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform())) {
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
-}
 </script>
 </body>
 </html>
