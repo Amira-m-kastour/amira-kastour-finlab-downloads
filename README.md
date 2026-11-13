@@ -46,14 +46,14 @@ PDF reports, Excel files and the results notebook open the iOS share sheet: choo
 
 FINLAB is developed by **Amira M Kastour**. If it helped your coursework, thesis or paper, please cite it:
 
-> Kastour, A. M. (2026). *Amira M Kastour FINLAB* (Version 1.1.5) [Computer software]. https://github.com/Amira-m-kastour/amira-kastour-finlab-downloads
+> Kastour, A. M. (2026). *Amira M Kastour FINLAB* (Version 1.1.6) [Computer software]. https://github.com/Amira-m-kastour/amira-kastour-finlab-downloads
 
 ```bibtex
 @software{kastour2026finlab,
   author  = {Kastour, Amira M},
   year    = {2026},
   title   = {Amira M Kastour {FINLAB}},
-  version = {1.1.5},
+  version = {1.1.6},
   note    = {Finance calculations with fx-991ES PLUS keystrokes, interpretation and academic sources},
   url     = {https://github.com/Amira-m-kastour/amira-kastour-finlab-downloads}
 }
